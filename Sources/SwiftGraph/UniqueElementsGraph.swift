@@ -50,14 +50,11 @@ open class UniqueElementsGraph<V: Equatable & Codable, E: Edge & Equatable>: Gra
     /// Add an edge to the graph. Only allow the edge to be added once
     ///
     /// - parameter e: The edge to add.
-    /// - parameter directed: If false, undirected edges are created.
-    ///                       If true, a reversed edge is also created.
-    ///                       Default is false.
-    public func addEdge(_ e: E, directed: Bool = false) {
+    public func addEdge(_ e: E) {
         if !self.edgeExists(e) {
             edges[e.u].append(e)
         }
-        if !directed {
+        if !e.directed {
             let reversedEdge = e.reversed()
             if !edgeExists(reversedEdge) {
                 edges[e.v].append(reversedEdge)
@@ -132,8 +129,8 @@ extension UniqueElementsGraph where E == UnweightedEdge {
         return g
     }
 
-    private struct QueueElement<V> {
-        let v: V
+    private struct QueueElement<VT> {
+        let v: VT
         let previousIndex: Int
     }
 

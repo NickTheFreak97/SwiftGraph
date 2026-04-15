@@ -1,23 +1,24 @@
 # SwiftGraph
 
-[![Swift Versions](https://img.shields.io/badge/Swift-1%2C2%2C3%2C4%2C5-green.svg)](https://swift.org)
+[![Swift Versions](https://img.shields.io/badge/Swift-1%2C2%2C3%2C4%2C5%2C6-green.svg)](https://swift.org)
 [![CocoaPods Version](https://img.shields.io/cocoapods/v/SwiftGraph.svg)](https://cocoapods.org/pods/SwiftGraph)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![SPM Compatible](https://img.shields.io/badge/SPM-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/)
 [![CocoaPods Platforms](https://img.shields.io/cocoapods/p/SwiftGraph.svg)](https://cocoapods.org/pods/SwiftGraph)
 [![Linux Compatible](https://img.shields.io/badge/Linux-compatible-4BC51D.svg?style=flat)](https://swift.org)
 [![Twitter Contact](https://img.shields.io/badge/contact-@davekopec-blue.svg?style=flat)](https://twitter.com/davekopec)
-[![Build Status](https://travis-ci.org/davecom/SwiftGraph.svg?branch=master)](https://travis-ci.org/davecom/SwiftGraph)
-[![Maintainability](https://api.codeclimate.com/v1/badges/b93b35351ff96b21678f/maintainability)](https://codeclimate.com/github/davecom/SwiftGraph/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/b93b35351ff96b21678f/test_coverage)](https://codeclimate.com/github/davecom/SwiftGraph/test_coverage)
 
-SwiftGraph is a pure Swift (no Cocoa) implementation of a graph data structure, appropriate for use on all platforms Swift supports (iOS, macOS, Linux, etc.). It includes support for weighted, unweighted, directed, and undirected graphs. It uses generics to abstract away both the type of the vertices, and the type of the weights.
+SwiftGraph is a Swift implementation of a graph data structure, appropriate for use on all platforms Swift supports (iOS, macOS, Linux, etc.). It includes support for weighted, unweighted, directed, and undirected graphs. It uses generics to abstract away both the type of the vertices, and the type of the weights.
 
 It includes copious in-source documentation, unit tests, as well as search functions for doing things like breadth-first search, depth-first search, and Dijkstra's algorithm. Further, it includes utility functions for topological sort, Jarnik's algorithm to find a minimum-spanning tree, detecting a DAG (directed-acyclic-graph), enumerating all cycles, and more.
 
 ## Installation
 
 SwiftGraph 3.0 and above requires Swift 5 (Xcode 10.2). Use SwiftGraph 2.0 for Swift 4.2 (Xcode 10.1) support, SwiftGraph 1.5.1 for Swift 4.1 (Xcode 9), SwiftGraph 1.4.1 for Swift 3 (Xcode 8), SwiftGraph 1.0.6 for Swift 2 (Xcode 7), and SwiftGraph 1.0.0 for Swift 1.2 (Xcode 6.3) support. SwiftGraph supports GNU/Linux and is tested on it.
+
+### Swift Package Manager (SPM)
+
+Use this repository as your dependency.
 
 ### CocoaPods
 
@@ -28,12 +29,8 @@ Use the CocoaPod `SwiftGraph`.
 Add the following to your `Cartfile`:
 
 ```
-github "davecom/SwiftGraph" ~> 3.1
+github "davecom/SwiftGraph" ~> 4.0
 ```
-
-### Swift Package Manager (SPM)
-
-Use this repository as your dependency.
 
 ### Manual
 
