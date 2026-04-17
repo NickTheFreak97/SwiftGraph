@@ -46,51 +46,105 @@ fileprivate class UnionFind {
 
 
 extension Graph {
-    /// If this graph is a valid tree, this algorihtm finds and returns the index of the root vertex in `self.vertices`.
+    
+    /// Finds all edges in the same connected component as the given vertex using Union-Find.
     ///
-    /// May require further testing.
+    /// - Parameter vertexIndex: The index of the vertex whose connected component edges you want to find.
+    /// - Returns: An array of all edges in the same connected component as the vertex, or an empty array
+    ///            if the vertex index is out of bounds.
     ///
-    /// - Returns: The index of of the root of the tree, if this `self` is a tree, `nil` otherwise. If the graph is a degenerate tree,
-    /// i.e. an empty tree, this function returns nil.
-    ///
-    /// - Complexity: **Time:** O(V + E⋅α(V)) where α(V) is the inverse Ackermann function, that grows extremely slowly (it is considered
-    /// constant for any common practical application). **Memory:** O(V) to create the sets for Union-Find by rank with path compression.
-    public func findTreeRoot() -> Int? {
+    /// - Complexity: **Time:** O(V + E⋅α(V)) where α(V) is the inverse Ackermann function.
+    ///               **Memory:** O(V) for the Union-Find structure.
+    public func edgesInComponent(ofVertexAt vertexIndex: Int) -> [E] {
+        guard vertexIndex >= 0 && vertexIndex < vertices.count else {
+            return []
+        }
+        
         let unionFind = UnionFind(elements: [Int](self.vertices.indices))
         
         for vertex in 0..<self.vertices.count {
-            let rootVertex = unionFind.find(vertex)
-            for neighbor in self.edges[vertex] {
-                assert(neighbor.u == vertex)
-                let rootNeighbor = unionFind.find(neighbor.v)
-                
-                if rootVertex == rootNeighbor {
-                    return nil
-                }
-                
-                unionFind.union(rootVertex, rootNeighbor)
+            for edge in self.edges[vertex] {
+                unionFind.union(vertex, edge.v)
             }
         }
-
-        var roots = Set<Int>()
+        
+        let targetComponent = unionFind.find(vertexIndex)
+        var componentEdges: [E] = []
+        
         for vertex in 0..<self.vertices.count {
-            roots.insert(unionFind.find(vertex))
+            if unionFind.find(vertex) == targetComponent {
+                for edge in self.edges[vertex] {
+                    if edge.directed || edge.v >= edge.u {
+                        componentEdges.append(edge)
+                    }
+                }
+            }
         }
-    
-        if roots.count == 1 {
-            return roots.first
-        } else {
-            return nil
-        }
+        
+        return componentEdges
     }
     
-    
-    
-    public func findTreeRootVertex() -> V? {
-        guard let root = findTreeRoot() else {
+    /// Finds all edges in the same connected component as the given vertex using Union-Find.
+    ///
+    /// This is a convenience method that accepts a vertex value instead of an index.
+    ///
+    /// - Parameter vertex: The vertex whose connected component edges you want to find.
+    /// - Returns: An array of all edges in the same connected component as the vertex, or `nil`
+    ///            if the vertex is not found in the graph.
+    ///
+    /// - Complexity: **Time:** O(V + E⋅α(V)) where α(V) is the inverse Ackermann function.
+    ///               **Memory:** O(V) for the Union-Find structure.
+    public func edgesInComponent(ofVertex vertex: V) -> [E]? {
+        guard let index = indexOfVertex(vertex) else {
             return nil
         }
         
-        return self.vertices[root]
+        return edgesInComponent(ofVertexAt: index)
+    }
+    
+    /// Finds the root vertex (vertex with indegree 0) in the same connected component as the given vertex.
+    ///
+    /// Note: BFS/DFS can't "climb up" directed edges (they only follow outgoing edges), and UnionFind
+    /// only tracks connectivity, not directional structure. This method uses UnionFind to identify
+    /// the component, then finds the vertex with indegree 0.
+    ///
+    /// Since UnionFind groups vertices by connectivity, any edge pointing to a vertex must come from
+    /// another vertex in the same component. Therefore, indegree within the component equals total indegree.
+    ///
+    /// - Parameter vertexIndex: The index of the vertex whose component root you want to find.
+    /// - Returns: The index of the root vertex (indegree 0) in the same component, or `nil` if
+    ///            the vertex is out of bounds, no root exists (cycle), or multiple roots exist.
+    ///
+    /// - Complexity: **Time:** O(V² + E⋅α(V)) due to indegree checks. **Memory:** O(V).
+    public func rootOfComponent(containingVertexAt vertexIndex: Int) -> Int? {
+        guard vertexIndex >= 0 && vertexIndex < vertices.count else {
+            return nil
+        }
+        
+        let unionFind = UnionFind(elements: [Int](self.vertices.indices))
+        
+        for vertex in 0..<self.vertices.count {
+            for edge in self.edges[vertex] {
+                unionFind.union(vertex, edge.v)
+            }
+        }
+        
+        let targetComponent = unionFind.find(vertexIndex)
+        let componentVertices = self.vertices.indices.filter { unionFind.find($0) == targetComponent }
+        let roots = componentVertices.filter { indegreeOfVertex(at: $0) == 0 }
+        
+        return roots.count == 1 ? roots.first : nil
+    }
+    
+    /// Finds the root vertex (vertex with indegree 0) in the same connected component as the given vertex.
+    ///
+    /// - Parameter vertex: The vertex whose component root you want to find.
+    /// - Returns: The root vertex, or `nil` if not found or no unique root exists.
+    public func rootOfComponent(containingVertex vertex: V) -> V? {
+        guard let index = indexOfVertex(vertex),
+              let rootIndex = rootOfComponent(containingVertexAt: index) else {
+            return nil
+        }
+        return self.vertices[rootIndex]
     }
 }
