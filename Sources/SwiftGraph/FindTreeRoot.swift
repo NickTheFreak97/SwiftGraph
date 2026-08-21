@@ -102,6 +102,41 @@ extension Graph {
         return edgesInComponent(ofVertexAt: index)
     }
     
+    
+    /// Finds all connected components in graph using Union-Find.
+    ///
+    ///
+    /// - Returns: A 2D array whose rows are indices of vertices that make up a connected component in the graph.
+    ///
+    /// - Complexity: **Time:** O(V + E⋅α(V)) where α(V) is the inverse Ackermann function.
+    ///               **Memory:** O(V) for the Union-Find structure
+    public func connectedComponents() -> [[Int]] {
+        let unionFind = UnionFind(elements: [Int](self.vertices.indices))
+        for vertex in 0..<self.vertices.count {
+            for edge in self.edges[vertex] {
+                unionFind.union(vertex, edge.v)
+            }
+        }
+
+        var componentsByRoot: [Int: [Int]] = [:]
+        for vertex in 0..<self.vertices.count {
+            componentsByRoot[unionFind.find(vertex), default: []].append(vertex)
+        }
+        return Array(componentsByRoot.values)
+    }
+
+    
+    /// Finds all connected components in graph using Union-Find.
+    ///
+    ///
+    /// - Returns: A 2D array whose elements are the vertices that make up a connected component in the graph.
+    ///
+    /// - Complexity: **Time:** O(V + E⋅α(V)) where α(V) is the inverse Ackermann function.
+    ///               **Memory:** O(V) for the Union-Find structure
+    public func connectedComponentVertices() -> [[V]] {
+        self.connectedComponents().map { $0.map { self.vertexAtIndex($0) } }
+    }
+    
     /// Finds the root vertex (vertex with indegree 0) in the same connected component as the given vertex.
     ///
     /// Note: BFS/DFS can't "climb up" directed edges (they only follow outgoing edges), and UnionFind
@@ -120,19 +155,21 @@ extension Graph {
         guard vertexIndex >= 0 && vertexIndex < vertices.count else {
             return nil
         }
-        
+
         let unionFind = UnionFind(elements: [Int](self.vertices.indices))
-        
+        var indegree = [Int](repeating: 0, count: self.vertices.count)
+
         for vertex in 0..<self.vertices.count {
             for edge in self.edges[vertex] {
                 unionFind.union(vertex, edge.v)
+                indegree[edge.v] += 1
             }
         }
-        
+
         let targetComponent = unionFind.find(vertexIndex)
-        let componentVertices = self.vertices.indices.filter { unionFind.find($0) == targetComponent }
-        let roots = componentVertices.filter { indegreeOfVertex(at: $0) == 0 }
-        
+        let roots = self.vertices.indices.filter {
+            unionFind.find($0) == targetComponent && indegree[$0] == 0
+        }
         return roots.count == 1 ? roots.first : nil
     }
     

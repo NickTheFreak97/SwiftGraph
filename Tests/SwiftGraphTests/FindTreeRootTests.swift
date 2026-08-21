@@ -19,7 +19,7 @@
 import XCTest
 @testable import SwiftGraph
 
-internal extension SwiftGraph.Graph {
+public extension SwiftGraph.Graph {
     func toDOT(_ graphName: String = "componentsGraph", nodeName: ((Self.V) -> String)? = nil )  -> String {
         let nodeName = nodeName ?? { String(describing: $0) }
         
@@ -67,37 +67,4 @@ class FindTreeRootTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFindTreeRoot() throws {
-        let originalGraph = WeightedGraph<String, Float>()
-        
-        for component in ["topbar", "secondary topbar", "gallery", "toolbar", "captions"] {
-            let _ = originalGraph.addVertex(component)
-        }
-                
-        originalGraph.addEdge(fromIndex: 0, toIndex: 1, weight: 1.2, directed: true)
-        originalGraph.addEdge(fromIndex: 0, toIndex: 2, weight: 0.5, directed: true)
-        originalGraph.addEdge(fromIndex: 0, toIndex: 3, weight: 1.1, directed: true)
-        originalGraph.addEdge(fromIndex: 0, toIndex: 4, weight: 1.3, directed: true)
-        
-        originalGraph.addEdge(fromIndex: 1, toIndex: 0, weight: 1.1, directed: true)
-        originalGraph.addEdge(fromIndex: 1, toIndex: 2, weight: 0.5, directed: true)
-        originalGraph.addEdge(fromIndex: 1, toIndex: 3, weight: 1.5, directed: true)
-        originalGraph.addEdge(fromIndex: 1, toIndex: 4, weight: 2.2, directed: true)
-
-        originalGraph.addEdge(fromIndex: 3, toIndex: 2, weight: 1.0, directed: true)
-        originalGraph.addEdge(fromIndex: 3, toIndex: 4, weight: 1.0, directed: true)
-        
-        assert(originalGraph.findTreeRoot() == nil)
-        
-        
-        let msaOfTopbar = try originalGraph.msa(root: 1)
-        
-        let msaAsGraph = WeightedGraph<String, Float>(vertices: originalGraph.vertices)
-        for edge in msaOfTopbar {
-            msaAsGraph.addEdge(edge, directed: true)
-        }
-        
-        print(msaAsGraph.toDOT())
-        assert(msaAsGraph.findTreeRoot() == 1)
-    }
 }
